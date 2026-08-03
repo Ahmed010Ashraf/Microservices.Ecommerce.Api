@@ -1,6 +1,11 @@
 
+using Discount.Api.Services;
+using Discount.Application.Command;
+using Discount.Application.Mapper;
 using Discount.Core.Repositories;
+using Discount.Infrastructure.Extention;
 using Discount.Infrastructure.Repositories;
+using System.Reflection;
 
 namespace Discount.Api
 {
@@ -17,6 +22,17 @@ namespace Discount.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+            builder.Services.AddAutoMapper(ctf => { }, typeof(DiscountProfile).Assembly);
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                cfg.RegisterServicesFromAssembly(typeof(CreateDiscountCommand).Assembly);
+            });
+
+            builder.Services.AddScoped<IDiscountRepository , DiscountRepositories>();
+            builder.Services.AddGrpc();
+
             var app = builder.Build();
 
             
@@ -25,14 +41,28 @@ namespace Discount.Api
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
             }
 
-            app.UseAuthorization();
+            app.Migration<Program>();
 
+            app.UseRouting();
 
-            app.MapControllers();
+            app.UseEndpoints(endpoints => {
+
+                endpoints.MapGrpcService<DiscountService>();
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Communitation with gRPC service should be by grpc client");
+                });
+
+            });
+
+            //app.MapGrpcService<DiscountService>();
+            //app.MapGet("/", async context =>
+            //{
+            //    await context.Response.WriteAsync("Communitation with gRPC service should be by grpc client");
+            //});
 
             app.Run();
         }

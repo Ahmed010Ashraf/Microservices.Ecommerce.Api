@@ -45,6 +45,7 @@ namespace Discount.Infrastructure.Extention
                 try
                 {
                     var connection = new NpgsqlConnection(config.GetValue<string>("DatabaseSetting:ConnectionString"));
+                    connection.Open();
                     var command = new NpgsqlCommand()
                     {
                         Connection = connection
@@ -58,9 +59,15 @@ namespace Discount.Infrastructure.Extention
                                                        Amount INT);";
                     command.ExecuteNonQuery();
 
-                    command.CommandText = "INSERT INTO Coupon VALUES ('Egypt Adidas Quick Force Indoor Badminton Shoes' ,'Adidas' , 500);";
+                    command.CommandText = @"
+    INSERT INTO Coupon (ProductName, Description, Amount)
+    VALUES ('Egypt Adidas Quick Force Indoor Badminton Shoes', 'Adidas', 500);";
+
                     command.ExecuteNonQuery();
-                    command.CommandText = "INSERT INTO Coupon VALUES ('PowerFit 19 FH Rubber Spike Cricket Shoes' ,'PowerFit' , 600);";
+
+                    command.CommandText = @"
+    INSERT INTO Coupon (ProductName, Description, Amount)
+    VALUES ('PowerFit 19 FH Rubber Spike Cricket Shoes', 'PowerFit', 600);";
                     command.ExecuteNonQuery();
                     
                     break;
