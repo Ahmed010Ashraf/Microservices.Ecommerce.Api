@@ -1,8 +1,10 @@
 
+using Basket.Application.GrpcServices;
 using Basket.Application.Mappers;
 using Basket.Application.Queries;
 using Basket.Core.Repository;
 using Basket.Infrastructure.Repository;
+using Discount.Grpc.Protos;
 using System.Reflection;
 
 namespace Basket.Api
@@ -51,6 +53,12 @@ namespace Basket.Api
                 cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 cfg.RegisterServicesFromAssembly(typeof(GetBasketByUserNameQuery).Assembly);
             });
+
+            //register grpc 
+            builder.Services.AddScoped<DiscountGrpcService>();
+            builder.Services.AddGrpcClient<DiscountProtoService.DiscountProtoServiceClient>(
+                cfg => cfg.Address = new Uri(builder.Configuration["GrpcSettings:DiscountUrl"])
+                );
 
             builder.Services.AddApiVersioning(opt =>
             {

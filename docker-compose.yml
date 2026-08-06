@@ -68,6 +68,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - CacheSetting__ConnectionString=BasketDb:6379
+      - GrpcSettings__DiscountUrl=http://discount.api:8080
   discount.api:
     image: ${DOCKER_REGISTRY-}discountapi
     build:
