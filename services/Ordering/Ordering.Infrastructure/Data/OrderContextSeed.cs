@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Ordering.Infrastructure.Data
 {
-    public class OrderContextSeed
+    public  class OrderContextSeed
     {
-        public async Task SeedAsync(OrderContext context, Logger<OrderContextSeed> logger)
+        public static async Task SeedAsync(OrderContext context, ILogger<OrderContextSeed> logger)
         {
             if (!context.Orders.Any())
             {
@@ -20,7 +20,7 @@ namespace Ordering.Infrastructure.Data
             }
         }
 
-        public IEnumerable<Core.Entities.Order> AddOrders()
+        public static IEnumerable<Core.Entities.Order> AddOrders()
         {
             var orders = new List<Core.Entities.Order>
             {
