@@ -56,6 +56,30 @@ services:
     restart: always
     volumes:
       - pgadmin_data:/root/.pgadmin
+  orderdb:
+      image: mcr.microsoft.com/mssql/server:2022-latest
+      container_name: orderdb
+      environment:
+        - ACCEPT_EULA=Y
+        - MSSQL_SA_PASSWORD=P@assword123
+      restart: always
+      ports:
+        - "1433:1433"
+      volumes:
+        - order_data:/var/opt/mssql
+      healthcheck:
+          test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'P@assword123' -Q 'SELECT 1'"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   basket.api:
     image: ${DOCKER_REGISTRY-}basketapi
     build:
@@ -64,11 +88,13 @@ services:
     ports:
       - "8001:8080"
     depends_on:
-      - CatalogDb
+      - rabbitmq
+      - BasketDb
     environment:
       - ASPNETCORE_URLS=http://+:8080
       - CacheSetting__ConnectionString=BasketDb:6379
       - GrpcSettings__DiscountUrl=http://discount.api:8080
+      - "EventBusSetting__HostAddress=amqp://guest:guest@rabbitmq:5672"
   discount.api:
     image: ${DOCKER_REGISTRY-}discountapi
     build:
@@ -83,10 +109,27 @@ services:
     ports:
        - "8002:8080"
 
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: services/Ordering/Ordering.Api/Dockerfile
+    environment:
+        - ASPNETCORE_URLS=http://+:8080
+        - ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderingDb2;User Id=sa;Password=P@assword123;TrustServerCertificate=True;
+        - "EventBusSetting__HostAddress=amqp://guest:guest@rabbitmq:5672"
+    depends_on:
+       - orderdb
+       - rabbitmq
+    ports:
+       - "8003:8080"
+
 volumes:
   catalogdata:
   postgres_data:
   pgadmin_data:
+  order_data:
+
 
 
 

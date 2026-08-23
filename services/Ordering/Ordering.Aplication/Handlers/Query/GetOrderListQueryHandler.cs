@@ -24,7 +24,7 @@ namespace Ordering.Application.Handlers.Query
         public async Task<List<OrderResponse>> Handle(GetOrderListQuery request, CancellationToken cancellationToken)
         {
            var orders = await  _Repo.GetOrderByUserName(request.UserName);
-            if (orders == null)
+            if (orders == null || orders.Count() == 0)
             {
                 throw new Exception("No orders found for the user");
             }

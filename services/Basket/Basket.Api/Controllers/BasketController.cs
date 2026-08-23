@@ -1,7 +1,10 @@
-﻿using Basket.Application.Commands;
+﻿using AutoMapper;
+using Basket.Application.Commands;
 using Basket.Application.Queries;
 using Basket.Application.Responses;
 using Basket.Core.Entities;
+using EventBus.Messages.Events;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +14,14 @@ namespace Basket.Api.Controllers
     public class BasketController : BaseApiController
     {
         private readonly IMediator _Mediator;
+        private readonly IPublishEndpoint _Publishendpoint;
+        private readonly IMapper _Mapper;
 
-        public BasketController(IMediator mediator )
+        public BasketController(IMediator mediator , IPublishEndpoint publishendpoint , IMapper mapper )
         {
             _Mediator = mediator;
+            _Publishendpoint = publishendpoint;
+            _Mapper = mapper;
         }
 
         [HttpGet("GetBasketByUserName/{UserName}")]
@@ -41,6 +48,30 @@ namespace Basket.Api.Controllers
             var res = await _Mediator.Send(command);
             return res;
             
+        }
+
+        [Route("checkout")]
+        [HttpPost]
+        
+        public async Task<IActionResult> checkout([FromBody] BasketCheckout basketcheckout)
+        {
+            //ensure that basket exists for the user before proceeding to checkout
+            var basket = await _Mediator.Send(new GetBasketByUserNameQuery(basketcheckout.UserName));
+            if(basket == null)
+            {
+                return BadRequest();
+            }
+
+            //createing and send the basket checkout event to the message broker
+            var eventmessage = _Mapper.Map<BasketCheckoutEvent>(basketcheckout);
+            eventmessage.TotalPrice = basket.TotalPrice;
+            await _Publishendpoint.Publish(eventmessage);
+
+            //delete the basket after checkout
+            var command = new DeleteBasketByUserNameCommand(basketcheckout.UserName);
+            await _Mediator.Send(command);
+
+            return Accepted();
         }
     }
 }

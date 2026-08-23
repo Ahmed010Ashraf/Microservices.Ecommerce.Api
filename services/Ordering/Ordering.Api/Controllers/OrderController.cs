@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ordering.Application.commands;
@@ -22,9 +22,9 @@ namespace Ordering.Api.Controllers
 
         [HttpGet("{UserName}", Name = "GetOrdersByUserName")]
         [ProducesResponseType(typeof(List<OrderResponse>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<OrderResponse>> GetOrderByUserName(string username)
+        public async Task<ActionResult<IEnumerable<OrderResponse>>> GetOrderByUserName([FromRoute] string UserName)
         {
-            var query = new GetOrderListQuery(username);
+            var query = new GetOrderListQuery(UserName);
             var res = await _Mediator.Send(query);
 
             return Ok(res);
