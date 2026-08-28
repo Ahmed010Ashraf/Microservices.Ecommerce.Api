@@ -13,10 +13,12 @@ namespace Catalog.Api.Controllers
     public class CatalogController : BaseApiController
     {
         private readonly IMediator _Mediator;
+        private readonly ILogger<CatalogController> _Logger;
 
-        public CatalogController(IMediator Mediator)
+        public CatalogController(IMediator Mediator , ILogger<CatalogController>logger)
         {
             _Mediator = Mediator;
+            _Logger = logger;
         }
         [HttpGet("GetProdcutById/{id}")]
         [ProducesResponseType(typeof(ProdcutResponseDto), (int)HttpStatusCode.OK)]
@@ -25,6 +27,7 @@ namespace Catalog.Api.Controllers
         {
             var query = new GetProductByIdQuery(id);
             var result = await _Mediator.Send(query);
+            _Logger.LogInformation("GetProductById called with id: {ProductId}", id);
             return Ok(result);
         }
 
@@ -45,6 +48,7 @@ namespace Catalog.Api.Controllers
         {
             var query = new GetAllProductsByNameQuery(ProductName);
             var result = await _Mediator.Send(query);
+            _Logger.LogInformation($"product with product name {ProductName} is fetched");
             return Ok(result);
         }
 

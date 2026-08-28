@@ -15,6 +15,7 @@ services:
       - DataBaseSettings__ProductCollection=Products
       - DataBaseSettings__BrandCollection=Brands
       - DataBaseSettings__TypeCollection=Types
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
   CatalogDb:
     image: mongo
     container_name: CatalogDb
@@ -95,6 +96,7 @@ services:
       - CacheSetting__ConnectionString=BasketDb:6379
       - GrpcSettings__DiscountUrl=http://discount.api:8080
       - "EventBusSetting__HostAddress=amqp://guest:guest@rabbitmq:5672"
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
   discount.api:
     image: ${DOCKER_REGISTRY-}discountapi
     build:
@@ -106,6 +108,7 @@ services:
          condition: service_healthy
     environment:
         - DatabaseSetting__ConnectionString=server=discountdb;port=5432;Database=DiscountDb;User Id=admin;Password=Password@1;
+        - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     ports:
        - "8002:8080"
 
@@ -118,17 +121,46 @@ services:
         - ASPNETCORE_URLS=http://+:8080
         - ConnectionStrings__OrderingConnectionString=Server=orderdb;Database=OrderingDb2;User Id=sa;Password=P@assword123;TrustServerCertificate=True;
         - "EventBusSetting__HostAddress=amqp://guest:guest@rabbitmq:5672"
+        - "ElasticConfiguration__Uri=http://elasticsearch:9200"
     depends_on:
        - orderdb
        - rabbitmq
     ports:
        - "8003:8080"
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+
+    ports:
+      - "9200:9200"
+
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.14.3
+    container_name: kibana
+
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+    ports:
+      - "5601:5601"
+
+    depends_on:
+      - elasticsearch
+
 volumes:
   catalogdata:
   postgres_data:
   pgadmin_data:
   order_data:
+  elasticsearch-data:
 
 
 

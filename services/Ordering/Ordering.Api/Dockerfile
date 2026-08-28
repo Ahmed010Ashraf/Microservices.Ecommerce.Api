@@ -17,6 +17,8 @@ COPY ["services/Ordering/Ordering.Aplication/Ordering.Application.csproj", "serv
 COPY ["services/Ordering/Ordering.Core/Ordering.Core.csproj", "services/Ordering/Ordering.Core/"]
 COPY ["services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj", "services/Ordering/Ordering.Infrastructure/"]
 COPY ["Infrastructure/EventBus.Messages/EventBus.Messages.csproj" , "Infrastructure/EventBus.Messages/"]
+COPY ["Infrastructure/common.logging/common.logging.csproj" , "Infrastructure/common.logging"]
+
 RUN dotnet restore "./services/Ordering/Ordering.Api/Ordering.Api.csproj"
 COPY . .
 WORKDIR "/src/services/Ordering/Ordering.Api"

@@ -4,7 +4,9 @@ using Catalog.Application.Queries;
 using Catalog.Core.Reposatories;
 using Catalog.Infrastructure.Data.Context;
 using Catalog.Infrastructure.Reposatory;
+using common.logging;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System.Reflection;
 
 namespace Catalog.Api
@@ -55,6 +57,9 @@ namespace Catalog.Api
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.ReportApiVersions = true;
             });
+
+            //configer logging
+            builder.Host.UseSerilog(Logging.ConfigureLogger);
 
             var app = builder.Build();
 

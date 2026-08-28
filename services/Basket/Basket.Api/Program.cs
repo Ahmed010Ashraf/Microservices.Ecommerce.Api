@@ -4,8 +4,10 @@ using Basket.Application.Mappers;
 using Basket.Application.Queries;
 using Basket.Core.Repository;
 using Basket.Infrastructure.Repository;
+using common.logging;
 using Discount.Grpc.Protos;
 using MassTransit;
+using Serilog;
 using System.Reflection;
 
 namespace Basket.Api
@@ -79,6 +81,10 @@ namespace Basket.Api
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.ReportApiVersions = true;
             });
+
+
+            //configer logging
+            builder.Host.UseSerilog(Logging.ConfigureLogger);
 
 
             var app = builder.Build();

@@ -1,10 +1,12 @@
 
+using common.logging;
 using Discount.Api.Services;
 using Discount.Application.Command;
 using Discount.Application.Mapper;
 using Discount.Core.Repositories;
 using Discount.Infrastructure.Extention;
 using Discount.Infrastructure.Repositories;
+using Serilog;
 using System.Reflection;
 
 namespace Discount.Api
@@ -35,8 +37,9 @@ namespace Discount.Api
 
             var app = builder.Build();
 
-            
-           
+
+            //configer logging
+            builder.Host.UseSerilog(Logging.ConfigureLogger);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

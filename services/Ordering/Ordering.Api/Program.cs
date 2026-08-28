@@ -1,4 +1,5 @@
 
+using common.logging;
 using EventBus.Messages.Common;
 using MassTransit;
 using Ordering.Api.EventBusConsumer;
@@ -6,6 +7,7 @@ using Ordering.Api.Extentions;
 using Ordering.Application.Extentions;
 using Ordering.Infrastructure.Data;
 using Ordering.Infrastructure.Extentions;
+using Serilog;
 
 namespace Ordering.Api
 {
@@ -68,6 +70,8 @@ namespace Ordering.Api
 
             builder.Services.AddMassTransitHostedService();
 
+            //configer logging
+            builder.Host.UseSerilog(Logging.ConfigureLogger);
 
             var app = builder.Build();
 
