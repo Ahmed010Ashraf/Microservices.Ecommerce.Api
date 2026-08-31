@@ -1,4 +1,5 @@
 
+using Asp.Versioning;
 using Basket.Application.GrpcServices;
 using Basket.Application.Mappers;
 using Basket.Application.Queries;
@@ -8,6 +9,7 @@ using common.logging;
 using Discount.Grpc.Protos;
 using MassTransit;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
 namespace Basket.Api
@@ -23,21 +25,7 @@ namespace Basket.Api
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(options =>
-            {
-                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-                {
-                    Title = "ShopingCart API",
-                    Version = "v1",
-                    Description = "API for managing ShopingCart items.",
-                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
-                    {
-                        Name = "Ahmed Ashraf",
-                        Email = "aaboshady59@gmail.com",
-                        Url = new Uri("https://ahmedashraf-henna.vercel.app/")
-                    }
-                });
-            });
+          
 
 
 
@@ -80,6 +68,55 @@ namespace Basket.Api
                 opt.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.ReportApiVersions = true;
+            }).AddApiExplorer(opt =>
+            {
+                opt.GroupNameFormat = "'v'VVV";
+                opt.SubstituteApiVersionInUrl = true;
+            });
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "ShopingCart API",
+                    Version = "v1",
+                    Description = "API for managing ShopingCart items.",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Name = "Ahmed Ashraf",
+                        Email = "aaboshady59@gmail.com",
+                        Url = new Uri("https://ahmedashraf-henna.vercel.app/")
+                    }
+                });
+
+
+                options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "ShopingCart API",
+                    Version = "v2",
+                    Description = "API for managing ShopingCart items. v2",
+                    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                    {
+                        Name = "Ahmed Ashraf",
+                        Email = "aaboshady59@gmail.com",
+                        Url = new Uri("https://ahmedashraf-henna.vercel.app/")
+                    }
+                });
+
+                //AddApiExplorer now is responsible for
+                //filtering the endpoints based on the api version
+                //and make the including and grouping,
+                //so we don't need to use DocInclusionPredicate anymore
+
+                //options.DocInclusionPredicate((version, apiDesc) =>
+                //{
+                //    if (!apiDesc.TryGetMethodInfo(out MethodInfo methodInfo)) return false;
+                //    var versions = methodInfo.DeclaringType?
+                //        .GetCustomAttributes(true)
+                //        .OfType<ApiVersionAttribute>()
+                //        .SelectMany(attr => attr.Versions);
+                //    return versions?.Any(v => $"v{v.ToString()}" == version) ?? false;
+                //});
             });
 
 
@@ -93,7 +130,13 @@ namespace Basket.Api
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(
+                    c =>
+                    {
+                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "basket api v1");
+                        c.SwaggerEndpoint("/swagger/v2/swagger.json", "basket api v2");
+                    }
+                    );
             }
 
             app.UseAuthorization();

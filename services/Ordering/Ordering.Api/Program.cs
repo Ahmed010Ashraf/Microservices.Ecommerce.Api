@@ -54,9 +54,11 @@ namespace Ordering.Api
 
             //configer rabbidmq
             builder.Services.AddScoped<BasketOrderConsumer>();
+            builder.Services.AddScoped<BasketOrderConsumerV2>();
             builder.Services.AddMassTransit(cfg =>
             {
                 cfg.AddConsumer<BasketOrderConsumer>();
+                cfg.AddConsumer<BasketOrderConsumerV2>();
                 cfg.UsingRabbitMq((context, config) =>
                 {
                     config.Host(builder.Configuration["EventBusSetting:HostAddress"]);
@@ -64,6 +66,11 @@ namespace Ordering.Api
                     config.ReceiveEndpoint(EventBusConstant.BasketCheckoutQueue, c =>
                     {
                         c.ConfigureConsumer<BasketOrderConsumer>(context);
+                    });
+
+                    config.ReceiveEndpoint(EventBusConstant.BasketCheckoutQueueV2, c =>
+                    {
+                        c.ConfigureConsumer<BasketOrderConsumerV2>(context);
                     });
                 });
             });
