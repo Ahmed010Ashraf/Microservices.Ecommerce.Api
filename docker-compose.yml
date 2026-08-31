@@ -155,12 +155,30 @@ services:
     depends_on:
       - elasticsearch
 
+  ocelotapigateway:
+    image: ${DOCKER_REGISTRY-}ocelotapigateway
+    build:
+      context: .
+      dockerfile: ApiGateway/OcelotApiGateway/Dockerfile
+    environment:
+        - ASPNETCORE_URLS=http://+:8080
+        - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
+    ports:
+      - "8010:8080" 
+        
+
 volumes:
   catalogdata:
   postgres_data:
   pgadmin_data:
   order_data:
   elasticsearch-data:
+
 
 
 
