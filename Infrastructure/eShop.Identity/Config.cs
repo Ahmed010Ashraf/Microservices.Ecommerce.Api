@@ -14,14 +14,16 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
         {
-            new ApiScope("scope1"),
-            new ApiScope("scope2"),
+            new ApiScope("catalogapi"),
         };
 
     public static IEnumerable<ApiResource> ApiResources =>
         new ApiResource[]
         {
-         
+         new ApiResource("Catalog", "Catalog API")
+         {
+             Scopes = { "catalogapi" }
+         }
         };
 
     public static IEnumerable<Client> Clients =>
@@ -54,5 +56,14 @@ public static class Config
                 AllowOfflineAccess = true,
                 AllowedScopes = { "openid", "profile", "scope2" }
             },
+
+            new Client
+            {
+                ClientId = "catalogapi",
+                ClientName = "Catalog API",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets = { new Secret("49C1A8V0-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
+                AllowedScopes = { "catalogapi" }
+            }
         };
 }
