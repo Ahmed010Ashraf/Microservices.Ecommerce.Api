@@ -5,6 +5,9 @@ using Catalog.Core.Reposatories;
 using Catalog.Infrastructure.Data.Context;
 using Catalog.Infrastructure.Reposatory;
 using common.logging;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System.Reflection;
@@ -18,8 +21,13 @@ namespace Catalog.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            //add global authorization filter to all end points 
+            var authpolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(config =>
+            {
+                config.Filters.Add(new AuthorizeFilter(authpolicy));
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -51,12 +59,52 @@ namespace Catalog.Api
                 cfg.RegisterServicesFromAssembly(typeof(GetProductByIdQuery).Assembly);
             });
 
+
+         
+
+
+
             builder.Services.AddApiVersioning(opt =>
             {
                 opt.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
                 opt.AssumeDefaultVersionWhenUnspecified = true;
                 opt.ReportApiVersions = true;
             });
+
+            //configer authentication and authorization 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.Authority = "https://host.docker.internal:9009";
+                    opt.RequireHttpsMetadata = true;
+
+                    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "https://localhost:9009",
+                        ValidateAudience = true,
+                        ValidAudience = "Catalog",
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+
+                    opt.BackchannelHttpHandler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine("======Authentication faild");
+                            Console.WriteLine($"======exception : {context.Exception.Message}");
+                            Console.WriteLine($"======Authority : {opt.Authority}");
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
 
             //configer logging
             builder.Host.UseSerilog(Logging.ConfigureLogger);
@@ -69,7 +117,7 @@ namespace Catalog.Api
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
