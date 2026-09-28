@@ -21,8 +21,13 @@ namespace Basket.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            //add global authorization filter to all end points 
+            var authpolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(config =>
+            {
+                config.Filters.Add(new AuthorizeFilter(authpolicy));
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
           
@@ -138,7 +143,7 @@ namespace Basket.Api
                     }
                     );
             }
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
