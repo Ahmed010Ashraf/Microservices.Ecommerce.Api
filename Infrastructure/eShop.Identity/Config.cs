@@ -15,6 +15,7 @@ public static class Config
         new ApiScope[]
         {
             new ApiScope("catalogapi"),
+            new ApiScope("basketapi")
         };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -23,6 +24,10 @@ public static class Config
          new ApiResource("Catalog", "Catalog API")
          {
              Scopes = { "catalogapi" }
+         },
+         new ApiResource("Basket", "Basket API")
+         {
+             Scopes = { "basketapi" }
          }
         };
 
@@ -63,7 +68,7 @@ public static class Config
                 ClientName = "Catalog API",
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 ClientSecrets = { new Secret("49C1A8V0-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
-                AllowedScopes = { "catalogapi" }
+                AllowedScopes = { "catalogapi" , "basketapi" }
             }
         };
 }
