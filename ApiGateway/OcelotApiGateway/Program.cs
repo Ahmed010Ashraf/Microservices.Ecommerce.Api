@@ -26,6 +26,17 @@ namespace OcelotApiGateway
                     opt.Authority = "https://host.docker.internal:9009";
                     opt.Audience = "eshoppinggateway"
                     opt.RequireHttpsMetadata = true;
+                    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "https://localhost:9009",
+                        ValidateAudience = true,
+                        ValidAudience = "Catalog",
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+
                 });
             //add ocelot configuration
             builder.Configuration.AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
