@@ -30,7 +30,42 @@ namespace Basket.Api
             });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-          
+
+
+            //configer authentication and authorization 
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(opt =>
+                {
+                    opt.Authority = "https://host.docker.internal:9009";
+                    opt.RequireHttpsMetadata = true;
+
+                    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = "https://localhost:9009",
+                        ValidateAudience = true,
+                        ValidAudience = "Basket",
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
+
+                    opt.BackchannelHttpHandler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine("======Authentication faild");
+                            Console.WriteLine($"======exception : {context.Exception.Message}");
+                            Console.WriteLine($"======Authority : {opt.Authority}");
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
 
 
 

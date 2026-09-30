@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Ocelot.DependencyInjection;
 using System.Threading.Tasks;
 
@@ -17,6 +18,15 @@ namespace OcelotApiGateway
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 
+
+            var authSchema = "EShoppingGatewaySchema";
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(authSchema, options =>
+                {
+                    opt.Authority = "https://host.docker.internal:9009";
+                    opt.Audience = "eshoppinggateway"
+                    opt.RequireHttpsMetadata = true;
+                });
             //add ocelot configuration
             builder.Configuration.AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 

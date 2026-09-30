@@ -15,7 +15,10 @@ public static class Config
         new ApiScope[]
         {
             new ApiScope("catalogapi"),
-            new ApiScope("basketapi")
+            new ApiScope("basketapi"),
+            new ApiScope("catalogapi.read"),
+            new ApiScope("catalogapi.write"),
+            new ApiScope("eshoppinggateway"),
         };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -23,11 +26,15 @@ public static class Config
         {
          new ApiResource("Catalog", "Catalog API")
          {
-             Scopes = { "catalogapi" }
+             Scopes = { "catalogapi.write" , "catalogapi.read" }
          },
          new ApiResource("Basket", "Basket API")
          {
              Scopes = { "basketapi" }
+         },
+         new ApiResource("EShoppingGateway", "eshoppinggateway API")
+         {
+             Scopes = { "eshoppinggateway" }
          }
         };
 
@@ -35,40 +42,30 @@ public static class Config
         new Client[]
         {
             // m2m client credentials flow client
-            new Client
-            {
-                ClientId = "m2m.client",
-                ClientName = "Client Credentials Client",
-
-                AllowedGrantTypes = GrantTypes.ClientCredentials,
-                ClientSecrets = { new Secret("511536EF-F270-4058-80CA-1C89C192F69A".Sha256()) },
-
-                AllowedScopes = { "scope1" }
-            },
-
-            // interactive client using code flow + pkce
-            new Client
-            {
-                ClientId = "interactive",
-                ClientSecrets = { new Secret("49C1A7E1-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
-                    
-                AllowedGrantTypes = GrantTypes.Code,
-
-                RedirectUris = { "https://localhost:44300/signin-oidc" },
-                FrontChannelLogoutUri = "https://localhost:44300/signout-oidc",
-                PostLogoutRedirectUris = { "https://localhost:44300/signout-callback-oidc" },
-
-                AllowOfflineAccess = true,
-                AllowedScopes = { "openid", "profile", "scope2" }
-            },
-
+            
             new Client
             {
                 ClientId = "catalogapi",
                 ClientName = "Catalog API",
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 ClientSecrets = { new Secret("49C1A8V0-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
-                AllowedScopes = { "catalogapi" , "basketapi" }
+                AllowedScopes = { "catalogapi.write", "catalogapi.read" }
+            },
+             new Client
+            {
+                ClientId = "basketapi",
+                ClientName = "Basket API",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets = { new Secret("49C1A8A2-0C79-4A89-A3D6-A37998FB86B0".Sha256()) },
+                AllowedScopes = {  "basketapi" }
+            },
+             new Client
+            {
+                ClientId = "eshoppinggateway",
+                ClientName = "eshoppinggateway API",
+                AllowedGrantTypes = GrantTypes.ClientCredentials,
+                ClientSecrets = { new Secret("49C1A8A2-0C79-4A70-A3D6-A37998FB86B0".Sha256()) },
+                AllowedScopes = { "eshoppinggateway", "basketapi" }
             }
         };
 }
