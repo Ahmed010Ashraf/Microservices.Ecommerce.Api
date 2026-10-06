@@ -60,6 +60,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eShop.Identity", "Infrastructure\eShop.Identity\eShop.Identity.csproj", "{2E93840C-4105-D4A8-9D2A-DB7ABC4795E0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nginx", "nginx", "{D5941B5D-ACE8-48B9-A8C1-34AB1E960A83}"
+	ProjectSection(SolutionItems) = preProject
+		ApiGateway\nginx\nginx.Dockerfile = ApiGateway\nginx\nginx.Dockerfile
+		ApiGateway\nginx\nginx.local.conf = ApiGateway\nginx\nginx.local.conf
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

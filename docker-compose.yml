@@ -177,12 +177,25 @@ services:
       - "8010:8080" 
         
 
+  identityserver:
+    image: ${DOCKER_REGISTRY-}eshopidentity
+    container_name: identityserver
+    environment:
+        - ASPNETCORE_URLS=http://+:9009
+        - ASPNETCORE_ENVIRONMENT=Development
+    build:
+      context: .
+      dockerfile: Infrastructure/eShop.Identity/Dockerfile
+    ports:
+        - "9009:9009"
+
 volumes:
   catalogdata:
   postgres_data:
   pgadmin_data:
   order_data:
   elasticsearch-data:
+
 
 
 
