@@ -42,12 +42,12 @@ orchestration, and API security.
 
 ## Architecture
 
-``` mermaid
+```mermaid
 flowchart TB
-    Client[Client / API Consumer]
+    Client[Client / Frontend]
     Nginx[Nginx Reverse Proxy]
-    Ocelot[Ocelot API Gateway]
     Identity[Identity Server]
+    Gateway[Ocelot API Gateway]
     Catalog[Catalog API]
     Basket[Basket API]
     Discount[Discount API]
@@ -60,17 +60,21 @@ flowchart TB
     Elastic[(Elasticsearch)]
     Kibana[Kibana]
 
-    Client --> Nginx
-    Client --> Ocelot
-    Nginx --> Identity
-    Nginx --> Catalog
-    Nginx --> Basket
-    Nginx --> Discount
-    Nginx --> Ordering
-    Ocelot --> Catalog
-    Ocelot --> Basket
-    Ocelot --> Discount
-    Ocelot --> Ordering
+    subgraph AuthFlow["1. Authentication flow"]
+        Client -->|Login request| Nginx
+        Nginx -->|Reverse-proxies request| Identity
+        Identity -->|Authentication response / token| Nginx
+        Nginx --> Client
+    end
+
+    subgraph ApiFlow["2. API requests after login"]
+        Client -->|API request with access token| Gateway
+        Gateway --> Catalog
+        Gateway --> Basket
+        Gateway --> Discount
+        Gateway --> Ordering
+    end
+
     Catalog --> Mongo
     Basket --> Redis
     Basket --> Discount
@@ -82,12 +86,11 @@ flowchart TB
     Basket --> Elastic
     Ordering --> Elastic
     Elastic --> Kibana
-    Client --> Identity
 ```
 
-The diagram represents the main components declared in the Docker
-Compose configuration. Exact request routes and event flows depend on
-the gateway configuration and service implementation.
+The client uses Nginx as the reverse-proxy path for authentication requests to the Identity Server. After login, the client sends API requests—normally including an access token—to the Ocelot API Gateway. Ocelot routes each request to the appropriate downstream service according to its route configuration.
+
+The gateway and/or downstream services must validate and authorize protected requests according to the application's actual authentication configuration. Exact public URLs, route mappings, token-validation behavior, and service-to-service calls depend on the repository's Nginx, Ocelot, Identity Server, and service configuration.
 
 ## Services
 
