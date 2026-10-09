@@ -195,13 +195,13 @@ services:
     image: ${DOCKER_REGISTRY-}eshopidentity
     container_name: identityserver
     environment:
-        - ASPNETCORE_URLS=http://+:9009
+        - ASPNETCORE_URLS=http://+:9011
         - ASPNETCORE_ENVIRONMENT=Development
     build:
       context: .
       dockerfile: Infrastructure/eShop.Identity/Dockerfile
     ports:
-        - "9009:9009"
+        - "9011:9011"
 
 volumes:
   catalogdata:

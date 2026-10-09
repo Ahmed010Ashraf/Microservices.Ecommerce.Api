@@ -19,7 +19,17 @@ try
     var app = builder
         .ConfigureServices()
         .ConfigurePipeline();
-    
+
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+    };
+
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+
+    app.UseForwardedHeaders(forwardedHeadersOptions);
+
     app.Run();
 }
 catch (Exception ex)
@@ -31,3 +41,6 @@ finally
     Log.Information("Shut down complete");
     Log.CloseAndFlush();
 }
+
+
+
