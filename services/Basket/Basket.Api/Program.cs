@@ -169,18 +169,47 @@ namespace Basket.Api
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // BEFORE UseSwagger / routing
+            app.Use((ctx, next) =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(
-                    c =>
-                    {
-                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "basket api v1");
-                        c.SwaggerEndpoint("/swagger/v2/swagger.json", "basket api v2");
-                    }
-                    );
-            }
+                if (ctx.Request.Headers.TryGetValue("X-Forwarded-Prefix", out var p) && !string.IsNullOrEmpty(p))
+                    ctx.Request.PathBase = p.ToString();   // e.g., "/catalog"
+                return next();
+            });
+
+            app.UseSwagger(c =>
+            {
+                // Make the OpenAPI "servers" base path match the prefix so Try it out uses /catalog/...
+                c.PreSerializeFilters.Add((doc, req) =>
+                {
+                    var prefix = req.Headers["X-Forwarded-Prefix"].FirstOrDefault();
+                    if (!string.IsNullOrEmpty(prefix))
+                        doc.Servers = new List<Microsoft.OpenApi.Models.OpenApiServer>
+            { new() { Url = prefix } };
+                });
+            });
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("v1/swagger.json", "Catalog.API v1"); // relative path (no leading '/')
+                c.RoutePrefix = "swagger";
+            });
+
+
+            //var nginxPath = "/basket";
+
+            //// Configure the HTTP request pipeline.
+            //if (app.Environment.IsDevelopment())
+            //{
+            //    app.UseSwagger();
+            //    app.UseSwaggerUI(
+            //        c =>
+            //        {
+            //            c.SwaggerEndpoint($"{nginxPath}/swagger/v1/swagger.json", "basket api v1");
+            //            c.SwaggerEndpoint($"{nginxPath}/swagger/v2/swagger.json", "basket api v2");
+            //        }
+            //        );
+            //}
             app.UseAuthentication();
             app.UseAuthorization();
 
