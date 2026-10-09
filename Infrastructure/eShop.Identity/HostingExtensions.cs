@@ -18,7 +18,7 @@ internal static class HostingExtensions
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
                 options.KeyManagement.Enabled = false;
-                options.IssuerUri = "https://localhost:9009";
+                options.IssuerUri = "http://identityserver:9011";
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;

@@ -21,15 +21,15 @@ namespace OcelotApiGateway
 
             var authSchema = "EShoppingGatewaySchema";
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(authSchema, options =>
+                .AddJwtBearer(authSchema, opt =>
                 {
-                    opt.Authority = "https://host.docker.internal:9009";
-                    opt.Audience = "eshoppinggateway"
+                    opt.Authority = "http://identityserver:9011";
+                    opt.Audience = "eshoppinggateway";
                     opt.RequireHttpsMetadata = true;
                     opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = "https://localhost:9009",
+                        ValidIssuer = "http://identityserver:9011",
                         ValidateAudience = true,
                         ValidAudience = "Catalog",
                         ValidateLifetime = true,

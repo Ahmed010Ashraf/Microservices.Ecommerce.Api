@@ -32,7 +32,7 @@ services:
       - DataBaseSettings__BrandCollection=Brands
       - DataBaseSettings__TypeCollection=Types
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
-      - Auth__Authority = "https://host.docker.internal:9009"
+      - Auth__Authority = "http://identityserver:9011"
       - Auth__RequireHttpsMetadata=flase
       - Auth__Audience=Catalog
   CatalogDb:
@@ -116,6 +116,8 @@ services:
       - GrpcSettings__DiscountUrl=http://discount.api:8080
       - "EventBusSetting__HostAddress=amqp://guest:guest@rabbitmq:5672"
       - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+      - Auth__Authority = "http://identityserver:9011"
+      - Auth__RequireHttpsMetadata=flase
   discount.api:
     image: ${DOCKER_REGISTRY-}discountapi
     build:

@@ -39,13 +39,13 @@ namespace Basket.Api
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    opt.Authority = "https://id-local.eshopping.com:44344";
-                    opt.RequireHttpsMetadata = true;
+                    opt.Authority = "http://identityserver:9011";
+                    opt.RequireHttpsMetadata = false;
 
                     opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = "https://id-local.eshopping.com:44344",
+                        ValidIssuer = "http://identityserver:9011",
                         ValidateAudience = true,
                         ValidAudience = "Basket",
                         ValidateLifetime = true,
