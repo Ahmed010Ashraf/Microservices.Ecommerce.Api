@@ -17,12 +17,13 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+                options.KeyManagement.Enabled = false;
                 options.IssuerUri = "https://localhost:9009";
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 options.EmitStaticAudienceClaim = true;
             })
-            .AddTestUsers(TestUsers.Users).AddDeveloperSigningCredential(presistkey:true,filename:"tepkey.jwk")
+            .AddTestUsers(TestUsers.Users).AddDeveloperSigningCredential(persistKey:true,filename:"tepkey.jwk")
 
         // in-memory, code config
         isBuilder.AddInMemoryIdentityResources(Config.IdentityResources);

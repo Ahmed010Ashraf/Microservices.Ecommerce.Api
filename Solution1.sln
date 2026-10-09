@@ -64,6 +64,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nginx", "nginx", "{D5941B5D
 		ApiGateway\nginx\id-local.conf = ApiGateway\nginx\id-local.conf
 		ApiGateway\nginx\id-local.crt = ApiGateway\nginx\id-local.crt
 		ApiGateway\nginx\id-local.key = ApiGateway\nginx\id-local.key
+		ApiGateway\nginx\id-local.pfx = ApiGateway\nginx\id-local.pfx
 		ApiGateway\nginx\nginx.Dockerfile = ApiGateway\nginx\nginx.Dockerfile
 		ApiGateway\nginx\nginx.local.conf = ApiGateway\nginx\nginx.local.conf
 	EndProjectSection

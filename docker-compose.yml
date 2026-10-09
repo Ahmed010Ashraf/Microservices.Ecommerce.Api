@@ -12,7 +12,7 @@ services:
       - discount.api
       - ordering.api
     ports:
-      - "9300:9100" 
+      - "44344:443" 
   catalog.api:
     image: ${DOCKER_REGISTRY-}catalogapi
     build:

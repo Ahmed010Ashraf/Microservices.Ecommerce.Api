@@ -8,6 +8,9 @@ using Basket.Infrastructure.Repository;
 using common.logging;
 using Discount.Grpc.Protos;
 using MassTransit;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
@@ -36,13 +39,13 @@ namespace Basket.Api
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
-                    opt.Authority = "https://host.docker.internal:9009";
+                    opt.Authority = "https://id-local.eshopping.com:44344";
                     opt.RequireHttpsMetadata = true;
 
                     opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidIssuer = "https://localhost:9009",
+                        ValidIssuer = "https://id-local.eshopping.com:44344",
                         ValidateAudience = true,
                         ValidAudience = "Basket",
                         ValidateLifetime = true,
